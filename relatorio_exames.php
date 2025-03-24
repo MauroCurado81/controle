@@ -1,20 +1,29 @@
 <?php
-// Dados de conexão
+// Conexão com o banco de dados
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "cadastro_exames";  // Nome do banco de dados
+$dbname = "cadastro_exames";
 
-// Criação da conexão
 $conn = new mysqli($servername, $username, $password, $dbname);
-
-// Verificando se houve erro na conexão
 if ($conn->connect_error) {
     die("Conexão falhou: " . $conn->connect_error);
 }
 
-// Consultar os exames cadastrados
-$sql = "SELECT * FROM exames";
+// Capturar filtros
+$nome = isset($_GET['nome']) ? $_GET['nome'] : '';
+$data_inicio = isset($_GET['data_inicio']) ? $_GET['data_inicio'] : '';
+$data_fim = isset($_GET['data_fim']) ? $_GET['data_fim'] : '';
+
+// Construir a consulta SQL dinâmica
+$sql = "SELECT * FROM exames WHERE 1=1";
+if (!empty($nome)) {
+    $sql .= " AND nome LIKE '%$nome%'";
+}
+if (!empty($data_inicio) && !empty($data_fim)) {
+    $sql .= " AND data_exame BETWEEN '$data_inicio' AND '$data_fim'";
+}
+
 $result = $conn->query($sql);
 ?>
 
@@ -27,28 +36,17 @@ $result = $conn->query($sql);
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background-color: white;
-            margin: 0;
-            padding: 10px;
+            margin: 20px;
         }
         .container {
             width: 90%;
             max-width: 1200px;
             margin: auto;
         }
-        a {
-            display: inline-block;
-            margin-bottom: 10px;
-            padding: 5px 10px;
-            background-color: #4e4e4e;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -64,52 +62,79 @@ $result = $conn->query($sql);
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
-        /* Responsividade */
-        .table-container {
-            width: 100%;
-            overflow-x: auto; /* Permite rolagem horizontal */
+        .filters {
+            margin-bottom: 20px;
+        }
+        .filters input, .filters button {
+            padding: 5px;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="relatorios.html">Voltar</a>
-        <h1>Relatório de Exames Cadastrados</h1>
-        
-        <div class="table-container">
-            <?php if ($result->num_rows > 0): ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Cargo</th>
-                            <th>Tipo de Exame</th>
-                            <th>Data do Exame</th>
-                            <th>Data do Próximo Exame</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $row['id']; ?></td>
-                                <td><?php echo $row['nome']; ?></td>
-                                <td><?php echo $row['cargo']; ?></td>
-                                <td><?php echo $row['tipo_exame']; ?></td>
-                                <td><?php echo date("d/m/Y", strtotime($row['data_exame'])); ?></td>
-                                <td><?php echo date("d/m/Y", strtotime($row['data_proximo_exame'])); ?></td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>Nenhum exame cadastrado até o momento.</p>
-            <?php endif; ?>
-        </div>
-    </div>
+<div class="container">
+    <h1>Relatório de Exames</h1>
 
-    <?php $conn->close(); ?>
+    <!-- Formulário de Filtros -->
+    <form method="GET" class="filters">
+        <label for="nome">Nome:</label>
+        <input type="text" name="nome" value="<?= $nome ?>">
+
+        <label for="data_inicio">Data Início:</label>
+        <input type="date" name="data_inicio" value="<?= $data_inicio ?>">
+
+        <label for="data_fim">Data Fim:</label>
+        <input type="date" name="data_fim" value="<?= $data_fim ?>">
+
+        <button type="submit">Filtrar</button>
+        <button type="button" onclick="window.location.href='relatorio.php'">Limpar</button>
+    </form>
+
+    <!-- Botões de Exportação -->
+    <button onclick="exportTableToExcel()">Exportar para Excel</button>
+    <button onclick="window.location.href='export_pdf.php?nome=<?= $nome ?>&data_inicio=<?= $data_inicio ?>&data_fim=<?= $data_fim ?>'">Exportar para PDF</button>
+
+    <!-- Tabela de Exames -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Cargo</th>
+                <th>Tipo de Exame</th>
+                <th>Data do Exame</th>
+                <th>Data do Próximo Exame</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= $row['id']; ?></td>
+                    <td><?= $row['nome']; ?></td>
+                    <td><?= $row['cargo']; ?></td>
+                    <td><?= $row['tipo_exame']; ?></td>
+                    <td><?= date("d/m/Y", strtotime($row['data_exame'])); ?></td>
+                    <td><?= date("d/m/Y", strtotime($row['data_proximo_exame'])); ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+</div>
+
+<!-- Script para Exportar Excel -->
+<script>
+function exportTableToExcel() {
+    let table = document.querySelector("table");
+    let file = new Blob([table.outerHTML], { type: "application/vnd.ms-excel" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(file);
+    a.download = "relatorio_exames.xls";
+    a.click();
+}
+</script>
 
 </body>
 </html>
+
+<?php $conn->close(); ?>
