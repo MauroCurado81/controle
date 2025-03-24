@@ -14,17 +14,14 @@ if ($conn->connect_error) {
 }
 
 // Consultar os exames cadastrados
-$sql = "SELECT * FROM exames";  // A consulta SQL para buscar os dados da tabela exames
-$result = $conn->query($sql);   // Executa a consulta
-
-// Inicia a exibição do HTML
+$sql = "SELECT * FROM exames";
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de Exames</title>
     <style>
@@ -32,11 +29,21 @@ $result = $conn->query($sql);   // Executa a consulta
             font-family: Arial, Helvetica, sans-serif;
             background-color: white;
             margin: 0;
-            padding: 0;
+            padding: 10px;
         }
         .container {
-            width: 80%;
-            margin: 20px auto;
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+        a {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background-color: #4e4e4e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
         }
         table {
             width: 100%;
@@ -57,48 +64,52 @@ $result = $conn->query($sql);   // Executa a consulta
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+        /* Responsividade */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* Permite rolagem horizontal */
+        }
     </style>
 </head>
 <body>
-    <a href="relatorios.html">Voltar</a>
+
     <div class="container">
+        <a href="relatorios.html">Voltar</a>
         <h1>Relatório de Exames Cadastrados</h1>
-        <?php if ($result->num_rows > 0): ?>
-            <!-- Exibir a tabela com os exames cadastrados -->
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cargo</th>
-                        <th>Tipo de Exame</th>
-                        <th>Data do Exame</th>
-                        <th>Data do Proximo Exame</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while($row = $result->fetch_assoc()): ?>
+        
+        <div class="table-container">
+            <?php if ($result->num_rows > 0): ?>
+                <table>
+                    <thead>
                         <tr>
-                            
-                            <td><?php echo $row['id']; ?></td>
-                            <td><?php echo $row['nome']; ?></td>
-                            <td><?php echo $row['cargo']; ?></td>
-                            <td><?php echo $row['tipo_exame']; ?></td>
-                            <td><?php echo $row['data_exame']; ?></td>
-                            <td><?php echo $row['data_proximo_exame']; ?></td>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Tipo de Exame</th>
+                            <th>Data do Exame</th>
+                            <th>Data do Próximo Exame</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-        <?php else: ?>
-            <p>Nenhum exame cadastrado até o momento.</p>
-        <?php endif; ?>
+                    </thead>
+                    <tbody>
+                        <?php while($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?php echo $row['id']; ?></td>
+                                <td><?php echo $row['nome']; ?></td>
+                                <td><?php echo $row['cargo']; ?></td>
+                                <td><?php echo $row['tipo_exame']; ?></td>
+                                <td><?php echo date("d/m/Y", strtotime($row['data_exame'])); ?></td>
+                                <td><?php echo date("d/m/Y", strtotime($row['data_proximo_exame'])); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>Nenhum exame cadastrado até o momento.</p>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <?php
-    // Fechar a conexão com o banco
-    $conn->close();
-    ?>
+    <?php $conn->close(); ?>
 
 </body>
 </html>
