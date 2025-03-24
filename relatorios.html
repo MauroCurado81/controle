@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Atestados, Exames e Aviso Prévio</title>
+    <style>
+        body{
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4; /* Cor neutra de fundo */
+            margin: 0;
+            padding: 0;
+        }
+        .container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box{
+            background-color: #ffffff; /* Caixa com fundo branco */
+            padding: 40px;
+            width: 280px;
+            border-radius: 10px;
+            color: #333; /* Cor de texto escuro */
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        }
+        .box h2{
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #333;
+        }
+        button{
+            background-color: #4e4e4e; /* Cor neutra para o botão */
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover{
+            background-color: #333333; /* Cor de fundo mais escura ao passar o mouse */
+        }
+        button:focus{
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <a href="selecionar.html">Voltar</a>
+    <div class="container">
+        <div class="box">
+            <p>Escolhe a opção desejada.</p>
+            <a href="atestado.html">
+                <button>Atestados</button>
+            </a>
+            <br><br>
+            <a href="relatorio_exames.php">
+                <button>Exames</button>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Login</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .box {
+            background-color: #ffffff;
+            padding: 40px;
+            width: 300px;
+            border-radius: 10px;
+            color: #333;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        .box h1 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+        label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+            text-align: left;
+        }
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 15px;
+            margin-bottom: 15px;
+            width: 100%;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #4e4e4e;
+        }
+        button {
+            background-color: #4e4e4e;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #333333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="box">
+            <h1>Login</h1>
+            <form action="login.php" method="POST">
+                <label for="username">Nome</label>
+                <input type="text" id="username" name="username" placeholder="Digite seu nome" required>
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
