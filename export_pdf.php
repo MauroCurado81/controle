@@ -1,5 +1,5 @@
 <?php
-require('fpdf/fpdf.php'); // Biblioteca FPDF (baixe em: http://www.fpdf.org/)
+require('C:\xampp\htdocs\relatorio_exames\fpdf186\fpdf.phpC:\xampp\htdocs\relatorio_exames\fpdf186\fpdf.php'); // Biblioteca FPDF (baixe em: http://www.fpdf.org/)
 
 // Conexão com banco de dados
 $servername = "localhost";
