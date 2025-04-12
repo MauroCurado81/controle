@@ -1,6 +1,4 @@
 <?php
-require('fpdf186/fpdf.php'); // Use caminhos relativos em produção
-
 // Conexão com o banco de dados
 $servidor = "localhost";
 $usuario = "root";
@@ -29,7 +27,6 @@ $sql = "SELECT * FROM exames WHERE 1=1";
 $params = [];
 $types = "";
 
-// Filtros
 if (!empty($nome)) {
     $sql .= " AND nome LIKE ?";
     $params[] = "%$nome%";
@@ -42,55 +39,92 @@ if (!empty($data_inicio) && !empty($data_fim)) {
     $types .= "ss";
 }
 
-// Preparar a consulta
 $stmt = $conn->prepare($sql);
 if ($stmt === false) {
     die("Erro na preparação da consulta: " . $conn->error);
 }
 
-// Vincular parâmetros
 if (!empty($params)) {
     $stmt->bind_param($types, ...$params);
 }
 
-// Executar a consulta
 $stmt->execute();
 $result = $stmt->get_result();
+?>
 
-// Criando o PDF
-$pdf = new FPDF();
-$pdf->AddPage();
-$pdf->SetFont('Arial', 'B', 16);
-$pdf->Cell(190, 10, 'Relatório de Exames', 1, 1, 'C');
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Exames</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 8px 12px;
+            text-align: center;
+        }
+        form {
+            width: 90%;
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
 
-$pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(30, 10, 'ID', 1);
-$pdf->Cell(50, 10, 'Nome', 1);
-$pdf->Cell(40, 10, 'Cargo', 1);
-$pdf->Cell(40, 10, 'Data Exame', 1);
-$pdf->Cell(30, 10, 'Próximo', 1);
-$pdf->Ln();
+<h1>Relatório de Exames</h1>
 
-$pdf->SetFont('Arial', '', 12);
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $pdf->Cell(30, 10, $row['id'], 1);
-        $pdf->Cell(50, 10, $row['nome'], 1);
-        $pdf->Cell(40, 10, $row['cargo'], 1);
-        $pdf->Cell(40, 10, date("d/m/Y", strtotime($row['data_exame'])), 1);
-        $pdf->Cell(30, 10, date("d/m/Y", strtotime($row['data_proximo_exame'])), 1);
-        $pdf->Ln();
-    }
-} else {
-    $pdf->Cell(190, 10, 'Nenhum resultado encontrado.', 1, 1, 'C');
-}
+<form method="get" action="">
+    <input type="text" name="nome" placeholder="Nome" value="<?php echo htmlspecialchars($nome); ?>">
+    <input type="date" name="data_inicio" value="<?php echo htmlspecialchars($data_inicio); ?>">
+    <input type="date" name="data_fim" value="<?php echo htmlspecialchars($data_fim); ?>">
+    <button type="submit">Filtrar</button>
+</form>
 
-// Exibir o PDF no navegador
-header('Content-Type: application/pdf');
-header('Content-Disposition: inline; filename="relatorio_exames.pdf"');
-$pdf->Output('I', 'relatorio_exames.pdf');
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Cargo</th>
+        <th>Data do Exame</th>
+        <th>Próximo Exame</th>
+    </tr>
+    <?php if ($result->num_rows > 0): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
+            <tr>
+                <td><?php echo $row['id']; ?></td>
+                <td><?php echo htmlspecialchars($row['nome']); ?></td>
+                <td><?php echo htmlspecialchars($row['cargo']); ?></td>
+                <td><?php echo date("d/m/Y", strtotime($row['data_exame'])); ?></td>
+                <td><?php echo date("d/m/Y", strtotime($row['data_proximo_exame'])); ?></td>
+            </tr>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="5">Nenhum resultado encontrado.</td>
+        </tr>
+    <?php endif; ?>
+</table>
 
-// Fechar a conexão
+</body>
+</html>
+
+<?php
 $stmt->close();
 $conn->close();
 ?>
